@@ -1,6 +1,14 @@
+import { useMutation } from '@apollo/client';
+import gql from 'graphql-tag';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+
+const TOGGLE_LIKE_MOVIE = gql`
+  mutation toggleLikeMovie($id: Int!) {
+    toggleLikeMovie(id: $id) @client
+  }
+`;
 
 const Container = styled.div`
   height: 400px;
@@ -20,11 +28,16 @@ const Poster = styled.div`
 `;
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default ({ id, bg, isLiked }) => (
-  <Container>
-    <Link to={`/${id}`}>
-      <Poster bg={bg} />
-    </Link>
-    <button>{isLiked ? 'Unlike' : 'Like'}</button>
-  </Container>
-);
+export default ({ id, bg, isLiked = false }) => {
+  const [toggleLikeMovie] = useMutation(TOGGLE_LIKE_MOVIE, {
+    variables: { id: parseInt(id) },
+  });
+  return (
+    <Container>
+      <Link to={`/${id}`}>
+        <Poster bg={bg} />
+      </Link>
+      <button onClick={toggleLikeMovie}>{isLiked ? 'Unlike' : 'Like'}</button>
+    </Container>
+  );
+};
